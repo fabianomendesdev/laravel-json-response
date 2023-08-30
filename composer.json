@@ -15,7 +15,12 @@
         }
     ],
     "require-dev": {
-        "pestphp/pest": "^2.16"
+        "pestphp/pest": "^2.16",
+        "illuminate/database": "^10.21",
+        "illuminate/contracts": "^10.21",
+        "illuminate/support": "^10.21",
+        "illuminate/validation": "^10.21",
+        "laravel-zero/foundation": "^10.20"
     },
     "config": {
         "allow-plugins": {
@@ -23,10 +28,5 @@
         }
     },
     "require": {
-        "illuminate/database": "^10.21",
-        "illuminate/contracts": "^10.21",
-        "illuminate/support": "^10.21",
-        "illuminate/validation": "^10.21",
-        "laravel-zero/foundation": "^10.20"
     }
 }
