@@ -14,5 +14,19 @@
             "email": "fabianomendesoficial@gmail.com"
         }
     ],
-    "require": {}
+    "require-dev": {
+        "pestphp/pest": "^2.16"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "require": {
+        "illuminate/database": "^10.21",
+        "illuminate/contracts": "^10.21",
+        "illuminate/support": "^10.21",
+        "illuminate/validation": "^10.21",
+        "laravel-zero/foundation": "^10.20"
+    }
 }
