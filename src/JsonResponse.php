@@ -137,13 +137,13 @@ class JsonResponse
 				if (is_array($items)) {
 					foreach ($items as $item) {
 						if ($item instanceof Model) {
-							$data[] = self::organizeResult($item->toArray());
+							$data[] = $item->toArray();
 						} else if (is_array($item)) {
-							$data[] = self::organizeResult($item);
+							$data[] = $item;
 						}
 					}
 				} else if (is_object($items)) {
-					$data = self::organizeResult($items->toArray());
+					$data = $items->toArray();
 				}
 				
 				return array_merge($data, ["page" => $page]);
