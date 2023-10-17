@@ -131,7 +131,22 @@ class JsonResponse
 		if ($pagination instanceof Paginator) {
 			$page = self::getPage($pagination);
 			if ($page) {
-				return array_merge($pagination->items(), ["page" => $page]);
+				$data = [];
+				$items = $pagination->items();
+				
+				if (is_array($items)) {
+					foreach ($items as $item) {
+						if ($item instanceof Model) {
+							$data[] = self::organizeResult($item->toArray());
+						} else if (is_array($item)) {
+							$data[] = self::organizeResult($item);
+						}
+					}
+				} else if (is_object($items)) {
+					$data = self::organizeResult($items->toArray());
+				}
+				
+				return array_merge($data, ["page" => $page]);
 			}
 		}
 		
@@ -224,7 +239,7 @@ class JsonResponse
 		
 		if (self::$subgroup) {
 			foreach (self::$subgroup as $index => $item) {
-				$temp = array_merge($temp, [$index => $item]);
+				$temp = array_merge($temp, [$index => self::subgroupCheckAndResponse($item)]);
 			}
 		}
 		
