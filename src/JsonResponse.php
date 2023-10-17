@@ -131,22 +131,28 @@ class JsonResponse
 		if ($pagination instanceof Paginator) {
 			$page = self::getPage($pagination);
 			if ($page) {
+				$result = [];
 				$data = [];
 				$items = $pagination->items();
 				
 				if (is_array($items)) {
-					foreach ($items as $item) {
-						if ($item instanceof Model) {
-							$data[] = $item->toArray();
-						} else if (is_array($item)) {
-							$data[] = $item;
-						}
-					}
+					$data = array_map(function ($item) {
+						if ($item instanceof Model)
+							return $item->toArray();
+						
+						if (is_array($item))
+							return $item;
+						
+						return [];
+					}, $items);
 				} else if (is_object($items)) {
 					$data = $items->toArray();
 				}
 				
-				return array_merge($data, ["page" => $page]);
+				$result = Arr::add($result, 'list', $data ?? []);
+				$result = Arr::add($result, 'page', $page);
+				
+				return $result;
 			}
 		}
 		
