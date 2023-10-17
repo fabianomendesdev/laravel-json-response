@@ -20,7 +20,8 @@
         "illuminate/contracts": "^10.21",
         "illuminate/support": "^10.21",
         "illuminate/validation": "^10.21",
-        "laravel-zero/foundation": "^10.20"
+        "laravel-zero/foundation": "^10.20",
+        "illuminate/http": "^10.28"
     },
     "config": {
         "allow-plugins": {
