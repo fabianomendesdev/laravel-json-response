@@ -16,6 +16,7 @@
     ],
     "config": {
     },
+    "minimum-stability": "stable",
     "require": {
         "php": "^8.0",
         "illuminate/support": "^11.0",
