@@ -5,7 +5,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Fabianomendesdev\\LaravelJsonResponse\\": "src/"
+            "Fabianomendesdev\\Api\\": "src/"
         }
     },
     "authors": [
@@ -14,19 +14,12 @@
             "email": "fabianomendesoficial@gmail.com"
         }
     ],
-    "require-dev": {
-        "pestphp/pest": "^2.16",
-        "illuminate/database": "^10.21",
-        "illuminate/contracts": "^10.21",
-        "illuminate/support": "^10.21",
-        "illuminate/validation": "^10.21",
-        "laravel-zero/foundation": "^10.20"
-    },
     "config": {
-        "allow-plugins": {
-            "pestphp/pest-plugin": true
-        }
     },
     "require": {
+        "php": "^8.0",
+        "laravel/laravel": "10.*"
+    },
+    "require-dev": {
     }
 }
