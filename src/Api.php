@@ -1,6 +1,6 @@
 <?php
 
-namespace Fabianomendesdev\Api;
+namespace Fabianomendesdev\LaravelJsonResponse;
 
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -34,12 +34,12 @@ final class Api implements ApiInterface
 	private static $keyRelationshipSubgroup = null;
 	private static $parentKey = null;
 	private static $add = null;
-	
+
 	public static function personalizedResponse($codeStatus = 200, $params = []): JsonResponse
 	{
 		self::$codeStatusResponse = $codeStatus;
 		self::paramsProcessor($params);
-		
+
 		if (self::$response instanceof Paginator) {
 			self::$data = self::buildData(self::$response->items());
 			if (!self::$pagination)
@@ -57,7 +57,7 @@ final class Api implements ApiInterface
 		} else if (self::$response instanceof JsonResource) {
 			self::$data = self::buildData(collect(self::$response->jsonSerialize()));
 		}
-		
+
 		return response()->json(
 			self::buildResult() ?? [],
 			self::$codeStatusResponse,
@@ -65,7 +65,7 @@ final class Api implements ApiInterface
 			JSON_UNESCAPED_SLASHES
 		);
 	}
-	
+
 	private static function paramsProcessor(Array $params)
 	{
 		self::$response = Arr::exists($params, 'response') ? $params['response'] : null;
@@ -81,46 +81,46 @@ final class Api implements ApiInterface
 		self::$parentKey = Arr::exists($params, 'parentKey') ? $params['parentKey'] : null;
 		self::$add = Arr::exists($params, 'add') ? $params['add'] : null;
 	}
-	
+
 	private static function buildResult()
 	{
 		$data = self::$data;
 		if (!self::$page) self::buildPageForPagination();
-		
+
 		$result = [
 			"success" => self::getSuccessResult()
 		];
-		
+
 		if (self::$message)
 			$result = Arr::add($result, 'message', self::$message);
-		
+
 		if (self::$detail)
 			$result = Arr::add($result, 'detail', self::$detail);
-		
+
 		if (self::$set)
 			$data = array_merge($data, self::$set);
-		
+
 		if (self::$parentKey)
 			self::$keyResponse = self::$parentKey;
-		
+
 		if (($data || self::$page || self::$keyResponse == 'list') && self::getSuccessResult())
 			$result = Arr::add($result, self::$keyResponse, $data ?? []);
-		
+
 		if (self::$add) {
 			foreach (self::$add as $index => $item) {
 				$result = Arr::add($result, $index, $item ?? []);
 			}
 		}
-		
+
 		if (count(self::$errors) > 0)
 			$result = Arr::add($result, 'errors', (Object) self::getFormattedErrors());
-		
+
 		if (self::$page)
 			$result = Arr::add($result, 'page', self::$page);
-		
+
 		return $result;
 	}
-	
+
 	private static function getSuccessResult()
 	{
 		return match (self::$codeStatusResponse) {
@@ -128,11 +128,11 @@ final class Api implements ApiInterface
 			default => false,
 		};
 	}
-	
+
 	private static function buildPageForPagination()
 	{
 		$pagination = self::$pagination;
-		
+
 		if ($pagination instanceof Paginator) {
 			self::$keyResponse = 'list';
 			self::$page = [
@@ -144,21 +144,21 @@ final class Api implements ApiInterface
 		} else {
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	private static function getFormattedErrors()
 	{
 		$errors = [];
-		
+
 		foreach (self::$errors as $key => $value) {
 			$errors = Arr::add($errors, $key, is_array($value) ? Arr::first($value) : $value);
 		}
-		
+
 		return $errors;
 	}
-	
+
 	/**
 	 * @param MessageBag $errors
 	 * @return SupCollection
@@ -169,11 +169,11 @@ final class Api implements ApiInterface
 			return collect($item)->first();
 		});
 	}
-	
+
 	private static function buildData($response)
 	{
 		$data = [];
-		
+
 		if (is_array($response)) {
 			self::$keyResponse = 'list';
 			foreach ($response as $item) {
@@ -187,34 +187,34 @@ final class Api implements ApiInterface
 			self::$keyResponse = 'data';
 			$data = self::organizeResult($response->toArray());
 		}
-		
+
 		return $data;
 	}
-	
+
 	private static function organizeResult($arrayValue)
 	{
 		$temp = Arr::only($arrayValue, self::PARAM_RESPONSE);
 		$temp = array_merge($temp, Arr::except($arrayValue, self::PARAM_RESPONSE));
-		
+
 		if (self::$relationshipSubgroup && self::$keyRelationshipSubgroup) {
 			$keyFirst = array_key_first(self::$relationshipSubgroup);
-			
+
 			if (($arrayValue[self::$keyRelationshipSubgroup] ?? false) && $keyFirst) {
 				$valueFirst = self::$relationshipSubgroup[$keyFirst];
 				$index = $arrayValue[self::$keyRelationshipSubgroup];
 				$temp = array_merge($temp, [$keyFirst => is_array($valueFirst[$index]) ? $valueFirst[$index] : array($valueFirst[$index])]);
 			}
 		}
-		
+
 		if (self::$subgroup) {
 			foreach (self::$subgroup as $index => $item) {
 				$temp = array_merge($temp, [$index => $item]);
 			}
 		}
-		
+
 		return $temp;
 	}
-	
+
 	/**
 	 * @param Validator $validator
 	 * @return \Illuminate\Http\JsonResponse
@@ -226,7 +226,7 @@ final class Api implements ApiInterface
 				'errors'  => $validator->errors()->messages()]
 		);
 	}
-	
+
 	/**
 	 * @param Throwable $e
 	 * @return JsonResponse
@@ -235,12 +235,12 @@ final class Api implements ApiInterface
 	{
 		return self::error($e, self::getStatusCode($e), "Não podemos prosseguir. Ocorreu um erro no sistema.");
 	}
-	
+
 	public static function standardErrorNotFound(NotFoundHttpException $notFoundHttpException): JsonResponse
 	{
 		return self::error($notFoundHttpException, 404, "Não encontramos este caminho.");
 	}
-	
+
 	/**
 	 * @param Validator $validator
 	 * @return string
@@ -248,12 +248,12 @@ final class Api implements ApiInterface
 	public static function errorFeedbackMessage(Validator $validator): string
 	{
 		$message = "";
-		
+
 		$errors = collect($validator->errors()->toArray());
-		
+
 		if ($errors->count() > 1) {
 			$message = 'Erro nos campos ';
-			
+
 			foreach ($errors->keys() as $i => $key) {
 				if ( $i == ($errors->keys()->count() - 1) ) $message .= " e $key.";
 				else if ( $i > 0 ) $message .= ", $key";
@@ -262,10 +262,10 @@ final class Api implements ApiInterface
 		} else if ( $errors->count() > 0 ) {
 			$message = collect($errors->first())->first();
 		}
-		
+
 		return $message;
 	}
-	
+
 	/**
 	 * @param Throwable $e
 	 * @return JsonResponse
@@ -274,10 +274,10 @@ final class Api implements ApiInterface
 	{
 		if (self::isDebug())
 			return self::error($e, self::getStatusCode($e), $e->getMessage());
-		
+
 		return self::systemStandardError($e);
 	}
-	
+
 	/**
 	 * @param Throwable $e
 	 * @param int $code
@@ -291,7 +291,7 @@ final class Api implements ApiInterface
 			'detail'  => self::errorDetail($e)
 		]);
 	}
-	
+
 	/**
 	 * @param string $message
 	 * @param int $code
@@ -303,7 +303,7 @@ final class Api implements ApiInterface
 			'message' => $message
 		]);
 	}
-	
+
 	/**
 	 * @param Throwable $e
 	 * @param string $message
@@ -314,7 +314,7 @@ final class Api implements ApiInterface
 	{
 		return self::error($e, self::getStatusCode($e, $code), $message);
 	}
-	
+
 	/**
 	 * @param Throwable $e
 	 * @param string $message
@@ -325,7 +325,7 @@ final class Api implements ApiInterface
 	{
 		return self::success($code, $message);
 	}
-	
+
 	/**
 	 * @param Throwable $e
 	 * @param int $code
@@ -338,7 +338,7 @@ final class Api implements ApiInterface
 			'message' => $msm
 		]);
 	}
-	
+
 	/**
 	 * @param Throwable $e
 	 * @param int $code
@@ -348,10 +348,10 @@ final class Api implements ApiInterface
 	{
 		if (! $code and $e instanceof HttpExceptionInterface)
 			$code = $e->getStatusCode();
-		
+
 		return $code ?: 500;
 	}
-	
+
 	/**
 	 * @param Throwable $e
 	 * @return array|null
@@ -366,10 +366,10 @@ final class Api implements ApiInterface
 				'line' => $e->getLine()
 			];
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * @return bool
 	 */
