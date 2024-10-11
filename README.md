@@ -5,7 +5,7 @@ composer require fabianomendesdev/laravel-json-response
 ```
 
 ```php
-use Fabianomendesdev\Api;
+use Fabianomendesdev\LaravelJsonResponse\Api;
 ```
 
 ```php
