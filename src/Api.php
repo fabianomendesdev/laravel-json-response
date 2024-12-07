@@ -278,16 +278,26 @@ final class Api implements ApiInterface
 		return self::systemStandardError($e);
 	}
 
+    /**
+     * @param Throwable $e
+     * @param string $messageHandled
+     * @return string
+     */
+    public static function getErrorMessage(Throwable $e, string $messageHandled): string
+    {
+        return self::isDebug() && $e->getMessage() ? $e->getMessage() : $messageHandled;
+    }
+
 	/**
 	 * @param Throwable $e
 	 * @param int $code
-	 * @param string $msm
+	 * @param string $messageHandled
 	 * @return JsonResponse
 	 */
-	private static function error(Throwable $e, int $code = 0, string $msm = ""): JsonResponse
+	private static function error(Throwable $e, int $code = 0, string $messageHandled = ""): JsonResponse
 	{
 		return self::personalizedResponse($code ?: 500, [
-			'message' => self::isDebug() && $e->getMessage() ? $e->getMessage() : $msm,
+			'message' => self::getErrorMessage($e, $messageHandled),
 			'detail'  => self::errorDetail($e)
 		]);
 	}
@@ -306,13 +316,13 @@ final class Api implements ApiInterface
 
 	/**
 	 * @param Throwable $e
-	 * @param string $message
+	 * @param string $messageHandled
 	 * @param int $code
 	 * @return JsonResponse
 	 */
-	public static function errorMessage(Throwable $e, string $message = "", int $code = 0): JsonResponse
+	public static function errorMessage(Throwable $e, string $messageHandled = "", int $code = 0): JsonResponse
 	{
-		return self::error($e, self::getStatusCode($e, $code), $message);
+		return self::error($e, self::getStatusCode($e, $code), $messageHandled);
 	}
 
 	/**
