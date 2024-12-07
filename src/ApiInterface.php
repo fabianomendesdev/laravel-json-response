@@ -26,6 +26,8 @@ interface ApiInterface
 
 	public static function exception(Throwable $e): JsonResponse;
 
+    public static function getErrorMessage(Throwable $e, string $messageHandled): string;
+
 	public static function message(string $message = "", int $code = 0): JsonResponse;
 
 	public static function errorMessage(Throwable $e, string $message = "", int $code = 0): JsonResponse;
