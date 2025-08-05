@@ -1,5 +1,7 @@
 # laravel-json-response
 
+**Laravel 12 support
+
 ```shell
 composer require fabianomendesdev/laravel-json-response
 ```
